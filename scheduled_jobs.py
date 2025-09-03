@@ -26,7 +26,7 @@ def process_orders(app):
         payload = {
             "product": order.product,
             "customer": order.customer,
-            "date": order.date_placed.isoformat(),
+            "date": order.date_placed_local(),
         }
 
         app.logger.info("payload %s", payload)
@@ -37,7 +37,6 @@ def process_orders(app):
         )
 
         app.logger.info("Response from endpoint: " + response.text)
-        app.logger.info("Response payload: " + response.json())
         response.raise_for_status()
 
         order.set_as_processed()
