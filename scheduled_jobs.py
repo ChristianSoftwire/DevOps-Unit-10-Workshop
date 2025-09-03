@@ -1,3 +1,4 @@
+from data import order
 from data.database import save_order, get_all_orders
 from products import create_product_download
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -31,10 +32,14 @@ def process_orders(app):
 
         app.logger.info("payload %s", payload)
 
-        response = requests.post(
-            app.config["FINANCE_PACKAGE_URL"] + "/ProcessPayment",
-            json=payload
-        )
+        try:
+            response = requests.post(
+                app.config["FINANCE_PACKAGE_URL"] + "/ProcessPayment",
+                json=payload
+            )
+        except requests.exceptions.RequestException:
+            app.logger.exception("Error processing order {id}".format(id = order.id))
+
 
         app.logger.info("Response from endpoint: " + response.text)
         response.raise_for_status()
